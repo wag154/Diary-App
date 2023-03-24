@@ -8,7 +8,7 @@ class User {
     }
 
     static async getOneById(id) {
-        const response = await db.query("SELECT * FROM user WHERE user_id = $1", [id])
+        const response = await db.query("SELECT * FROM user_account WHERE user_id = $1", [id])
         if (response.rows.length != 1) {
             throw new Error("Unable to locate user.")
         }
@@ -16,7 +16,7 @@ class User {
     }
 
     static async getOneByName(name) {
-        const response = await db.query("SELECT * FROM user WHERE name = $1", [name])
+        const response = await db.query("SELECT * FROM user_account WHERE name = $1", [name])
         if (response.rows.length != 1) {
             throw new Error("Unable to locate user.")
         }
@@ -25,10 +25,15 @@ class User {
 
     static async create(data) {
         const { name, password } = data
-        let response = await db.query("INSERT INTO user (name, password) VALUES ($1, $2) RETURNING user_id;", [name, password])
+        let response = await db.query("INSERT INTO user_account (name, password) VALUES ($1, $2) RETURNING user_id;", [name, password])
         const newId = response.rows[0].user_id
         const newUser = await User.getOneById(newId)
         return newUser
+    }
+
+    static async getAll() {
+        const response = await db.query("SELECT * FROM user_account")
+        return response.rows.map(u => new User(u))
     }
 
 }
