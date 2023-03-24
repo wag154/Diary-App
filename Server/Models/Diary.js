@@ -8,14 +8,20 @@ class Diary {
     this.user_id = user_id;
     this.release = release;
   }
+
+  static async getAll() {
+    const response = await db.query("SELECT * FROM diary;")
+    return response.rows.map(d => new Diary(d))
+  }
   
   static async getAllByUserId(id) {
     const response = await db.query("SELECT * FROM diary WHERE user_id = $1",[id])
     if (response.rows.length === 0){
       throw new Error("No diaries available");
     }
-    return response.rows.map(d => new diary(d))
+    return response.rows.map(d => new Diary(d))
   }
+
   static async getOneByDiaryId(id) {
     const response = await db.query("SELECT * FROM diary WHERE diary_id = $1", [id]);
     if (response.rows.length != 1) {
@@ -25,9 +31,9 @@ class Diary {
   }
 
   static async create(data) {
-    const {title, content, release} = data;
-    const response = await db.query("INSERT INTO diary (title, content, release) VALUES ($1, $2, $3) RETURNING *;",
-    [title, content, release]);
+    const {title, content, user_id, release} = data;
+    const response = await db.query("INSERT INTO diary (title, content, user_id, release) VALUES ($1, $2, $3, $4) RETURNING *;",
+    [title, content, user_id, release]);
     return response.rows.map(d => new Diary(d));
   }
 

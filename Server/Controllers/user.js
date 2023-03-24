@@ -2,6 +2,15 @@ const bcrypt = require('bcrypt')
 const User = require('../Models/User')
 const Token = require('../Models/Token')
 
+async function index(req, res){
+    try {
+        const users = await User.getAll()
+        res.json(users)
+    } catch (err) {
+        res.status(500).json({"error": err.message})
+    }
+}
+
 async function register (req, res) {
     try {
         const data = req.body
@@ -30,4 +39,4 @@ async function login (req, res) {
     }
 }
 
-module.exports = { register, login }
+module.exports = { index, register, login }
